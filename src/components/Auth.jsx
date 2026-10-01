@@ -1,0 +1,9 @@
+import React, { useEffect, useRef, useState } from 'react';
+import { api, money, date, labels, iceLabel } from '../lib/api.js';
+import { Icon, Cup, Modal, Field, Empty } from '../components/ui.jsx';
+
+export default function Auth({onClose,onDone,demo}){
+  const [register,setRegister]=useState(false),[error,setError]=useState(''),[busy,setBusy]=useState(false);
+  async function submit(e){e.preventDefault();setBusy(true);setError('');try{const body=Object.fromEntries(new FormData(e.currentTarget));const data=await api('/auth/'+(register?'register':'login'),{method:'POST',body});onDone(data.user);}catch(e){setError(e.message);}finally{setBusy(false);}}
+  return <Modal title={register?'Tạo tài khoản':'Chào bạn trở lại'} onClose={onClose}><p className="muted">Một tài khoản, những ly trà đúng gu.</p><form onSubmit={submit} className="stack">{register&&<Field label="Họ tên"><input name="name" required minLength={2} maxLength={100} autoComplete="name"/></Field>}<Field label="Email"><input name="email" type="email" required autoComplete="email" maxLength={190}/></Field><Field label="Mật khẩu"><input name="password" type="password" required minLength={register?10:1} maxLength={72} autoComplete={register?'new-password':'current-password'}/></Field>{error&&<p className="error" role="alert">{error}</p>}<button className="primary full" disabled={busy}>{busy?'Đang xử lý…':register?'Đăng ký':'Đăng nhập'}</button></form><button className="text-button auth-switch" onClick={()=>{setRegister(!register);setError('');}}>{register?'Đã có tài khoản? Đăng nhập':'Chưa có tài khoản? Đăng ký'}</button>{demo&&<div className="demo-login"><b>Tài khoản khách dùng thử</b><code>khach@teahouse.local</code><code>Khach@12345</code><small>Tài khoản quản trị có trong README của dự án.</small></div>}</Modal>;
+}
